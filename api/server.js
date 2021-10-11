@@ -19,6 +19,9 @@ app.use('/category', CategoryRouter);
 const BlogRouter = require('./routes/Blog')
 app.use('/blog', BlogRouter)
 
+const CommentRouter = require('./routes/Comment')
+app.use('/comment', CommentRouter)
+
 //database connection
 mongoose.connect(process.env.CONNECTION_URL).then(() =>{
     console.log("database connected")

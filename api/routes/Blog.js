@@ -109,5 +109,15 @@ router.get('/get/:email', async(req,res) =>{
     })
 })
 
+router.get('/archive/:text', async (req, res) =>{
+    Blog.find({date: { $regex:req.params.text,  $options: 'i'}}).exec((err, blog) =>{
+        if(err || !blog){
+            res.status(400).send({error: 'blog not found'});
+        }else{
+            res.status(200).send(blog);
+        }
+    })
+})
+
 
 module.exports = router;

@@ -8,6 +8,7 @@ import LatestPosts from "./components/LatestPosts";
 import Search from "./components/Search";
 import SingleBlog from "./components/SingleBlog";
 import User from "./components/User";
+import Archive from "./components/Archive";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path='/search/:search' exact component={Search} />
         <Route path="/blog/:id" exact component={SingleBlog}/>
         <Route path='/user' exact component={User} />
+        <Route path="/archive/:text" exact component={Archive}/>
       </Switch>
     </BrowserRouter>
   );
