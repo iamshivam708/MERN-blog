@@ -3,7 +3,7 @@ const router = express.Router();
 const User = require('../models/user')
 const bcrypt = require("bcryptjs");
 
-//add user
+//signup
 router.post("/", async (req,res) =>{
     const user = new User({
         name: req.body.name,
@@ -33,5 +33,17 @@ router.post('/login', async (req, res) =>{
         res.send(err);
     })
 })
+
+//getting user data from email
+router.get('/:email', async (req,res) =>{
+    await User.find({email:req.params.email}).exec((err,user) =>{
+        if(err || !user){
+            res.status(400).send({error: 'user not found'});
+        }else{
+            res.status(200).send(user);
+        }
+    })
+})
+
 
 module.exports = router

@@ -6,6 +6,8 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import Category from "./components/Category";
 import LatestPosts from "./components/LatestPosts";
 import Search from "./components/Search";
+import SingleBlog from "./components/SingleBlog";
+import User from "./components/User";
 
 function App() {
   return (
@@ -17,6 +19,8 @@ function App() {
         <Route path='/category/:title' exact component={Category} />
         <Route path='/latest' exact component={LatestPosts} />
         <Route path='/search/:search' exact component={Search} />
+        <Route path="/blog/:id" exact component={SingleBlog}/>
+        <Route path='/user' exact component={User} />
       </Switch>
     </BrowserRouter>
   );

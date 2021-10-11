@@ -83,9 +83,9 @@ class Home extends Component {
                 {featured.description}
               </p>
               <p className="lead mb-0">
-                <a href="." className="text-white fw-bold">
-                  Continue reading...
-                </a>
+              <Link to={"/blog/"+ featured._id} className="text-white fw-bold">
+                    Continue reading...
+              </Link>
               </p>
             </div>
             <div className="col-md-6" style={{height:'250px'}}>
@@ -106,9 +106,9 @@ class Home extends Component {
                   <p className="card-text mb-auto">
                     {featuredBlogs.description}
                   </p>
-                  <a href="." className="stretched-link">
+                  <Link to={"/blog/"+ featuredBlogs._id} className="stretched-link">
                     Continue reading...
-                  </a>
+                  </Link>
                 </div>
                 <div className="col-auto d-none d-lg-block" style={{height:'250px',width:'200px'}}>
                   <img src={"/blog/"+ featuredBlogs.image} height="100%" width="100%" alt="prop" />
@@ -141,9 +141,9 @@ class Home extends Component {
                   <p className="mb-auto">
                     {blog.description}
                   </p>
-                  <a href="." className="stretched-link">
+                  <Link to={"/blog/"+ blog._id} className="stretched-link">
                     Continue reading...
-                  </a>
+                  </Link>
                 </div>
                 <div className="col-auto d-none d-lg-block" style={{height:'250px',width:'300px'}}>
                 <img src={"/blog/"+ blog.image} height="100%" width="100%" alt="prop" />

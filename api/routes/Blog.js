@@ -21,6 +21,7 @@ router.post('/',upload.single('image'), async (req,res) =>{
     var date = moment().format("MMM Do YY");
     var time = moment().format('LT');
     const blog = new Blog({
+        email:req.body.email,
         title:req.body.title,
         description: req.body.description,
         category:req.body.category,
@@ -93,6 +94,17 @@ router.get('/search/:search', async (req,res) =>{
             return res.status(400).json('none')
         }else{
             return res.status(200).json(blogs)
+        }
+    })
+})
+
+//getting blog with user email
+router.get('/get/:email', async(req,res) =>{
+    Blog.find({email:req.params.email}).exec((err, blog) =>{
+        if(err || !blog){
+            res.status(400).send({error: 'blog not found'});
+        }else{
+            res.status(200).send(blog);
         }
     })
 })
