@@ -1,11 +1,35 @@
 import React, { Component } from "react";
 import Header from "./Header";
+import axios from "axios";
 
 class Login extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {
+      email:"",
+      password:""
+    };
+  }
+
+  handleSubmit = (e) =>{
+    e.preventDefault();
+    const user = {
+      email: this.state.email,
+      password: this.state.password
+    }
+    const url = "http://localhost:5000/user/login"
+    axios.post(url,user).then(res =>{
+      if(res.data.error){
+        alert(res.data.error);
+      }else{
+        sessionStorage.setItem('loggedIn',true);
+        sessionStorage.setItem('user',res.data.user);
+        this.props.history.push('/');
+      }
+    }).catch(err =>{
+      console.log(err);
+    })
   }
 
   render() {
@@ -30,35 +54,35 @@ class Login extends Component {
               />
             </div>
             <div className="col-6 px-3" align="center">
-              <form className="mt-5">
+              <form className="mt-5" onSubmit={this.handleSubmit}>
                 <img src="/logo.png" alt="" width="72" height="57" />
-                <h1 class="h3 mb-3 fw-normal">Login</h1>
+                <h1 className="h3 mb-3 fw-normal">Login</h1>
 
-                <div class="form-floating">
+                <div className="form-floating">
                   <input
                     type="email"
-                    class="form-control"
+                    className="form-control"
                     id="floatingInput"
-                    placeholder="name@example.com"
+                    onChange={e => this.setState({email:e.target.value})}
                   />
-                  <label for="floatingInput">Email address</label>
+                  <label htmlFor="floatingInput">Email address</label>
                 </div>
-                <div class="form-floating">
+                <div className="form-floating">
                   <input
                     type="password"
-                    class="form-control"
+                    className="form-control"
                     id="floatingPassword"
-                    placeholder="Password"
+                    onChange={e => this.setState({password:e.target.value})}
                   />
-                  <label for="floatingPassword">Password</label>
+                  <label htmlFor="floatingPassword">Password</label>
                 </div>
 
-                <div class="checkbox mb-3">
+                <div className="checkbox mb-3">
                   <label>
                     <input type="checkbox" value="remember-me" /> Remember me
                   </label>
                 </div>
-                <button class="w-100 btn btn-lg btn-primary" type="submit">
+                <button className="w-100 btn btn-lg btn-primary" type="submit">
                   Login
                 </button>
               </form>

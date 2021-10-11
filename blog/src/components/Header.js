@@ -1,37 +1,59 @@
 import React, { Component } from 'react'
-import { Link } from 'react-router-dom'
+import { Link,withRouter } from 'react-router-dom'
 
 class Header extends Component {
     constructor(props) {
         super(props)
     
         this.state = {
-             search:''
+             search:'',
+             loggedIn: sessionStorage.getItem('loggedIn')
         }
     }
 
     componentDidMount = () =>{
-        
+        if(this.state.loggedIn === 'true'){
+            document.getElementById('login').style.display = 'none';
+            document.getElementById('signup').style.display = 'none';
+        }else{
+            document.getElementById('logout').style.display = 'none';
+            document.getElementById('user').style.display = 'none';
+        }
+    }
+
+    handleLogout = () =>{
+        sessionStorage.removeItem('loggedIn');
+        sessionStorage.removeItem('user');
+        window.location.reload();
+    }
+
+    handleSearch = () =>{
+        this.props.history.push('/search/' + this.state.search)
+        window.location.reload();
     }
     
     render() {
         return (
             <div className="Header">
                 <div className="container">
-                <header class="blog-header py-2">
-                    <div class="row flex-nowrap justify-content-between align-items-center">
-                    <div class="col-4 pt-1">
-                        <Link class="link-secondary" to="/login">Login</Link>
+                <header className="blog-header py-2">
+                    <div className="row flex-nowrap justify-content-between align-items-center">
+                    <div className="col-4 pt-1" id="login">
+                        <Link className="link-secondary" to="/login">Login</Link>
                     </div>
-                    <div class="col-4 text-center">
-                        <a class="text-dark" href="." style={{fontSize:'2rem',textDecoration:'none'}}>Blogger</a>
+                    <div className="col-4 pt-1" id="logout">
+                        <button onClick={this.handleLogout} style={{border:'none',background:'none',borderBottom:'1px solid black'}} className="link-secondary">Logout</button>
                     </div>
-                    <div class="col-4 d-flex justify-content-end align-items-center">
-                        <input style={{maxWidth:'12em'}} type="text" className="form-control" placeholder={this.state.place} />
-                        <a style={{marginRight:"1em"}} class="btn btn-outline-secondary" href="." aria-label="Search">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="mx-3" role="img" viewBox="0 0 24 24"><title>Search</title><circle cx="10.5" cy="10.5" r="7.5"/><path d="M21 21l-5.2-5.2"/></svg>
-                        </a>
-                        <Link class="btn btn-sm btn-outline-secondary" to="/signup">Sign up</Link>
+                    <div className="col-4 text-center">
+                        <Link className="text-dark" to="/" style={{fontSize:'2rem',textDecoration:'none'}}>News Blogger</Link>
+                    </div>
+                    <div className="col-4 d-flex justify-content-end align-items-center">
+                        <input onChange={e => this.setState({search:e.target.value})} style={{maxWidth:'12em'}} type="text" className="form-control" placeholder="Search..." />
+                        <button onClick={this.handleSearch} style={{marginRight:"1em"}} className="btn btn-outline-secondary" aria-label="Search">
+                            <i className="fas fa-search"></i>
+                        </button>
+                        <Link id="signup" className="btn btn-sm btn-outline-secondary" to="/signup">Sign up</Link>
+                        <Link id="user" className="btn btn-sm btn-outline-secondary" to="/user">User</Link>
                     </div>
                     </div>
                 </header>
@@ -42,4 +64,4 @@ class Header extends Component {
     }
 }
 
-export default Header;
+export default withRouter(Header);

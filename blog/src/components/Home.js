@@ -1,57 +1,74 @@
 import React, { Component } from "react";
 import Footer from "./Footer";
 import Header from "./Header";
+import axios from 'axios';
+import {Link} from 'react-router-dom';
 
 class Home extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {
+      categories:[],
+      featured:[],
+      mainFeatured:[],
+      latest:[]
+    };
+  }
+
+  componentDidMount = () =>{
+    const url = "http://localhost:5000/category";
+    axios.get(url).then((res) =>{
+        this.setState({
+          categories: res.data
+        })
+    }).catch((err) =>{
+      console.log(err);
+    })
+
+    const url2 = 'http://localhost:5000/blog/featured/single/yes'
+    axios.get(url2).then((res) =>{
+      this.setState({
+        featured: res.data[0]
+      })
+  }).catch((err) =>{
+    console.log(err);
+  })
+
+  const url3 = 'http://localhost:5000/blog/featured/yes'
+    axios.get(url3).then((res) =>{
+      this.setState({
+        mainFeatured: res.data
+      })
+  }).catch((err) =>{
+    console.log(err);
+  })
+
+  const url4 = 'http://localhost:5000/blog/limited'
+    axios.get(url4).then((res) =>{
+      this.setState({
+        latest: res.data
+      })
+  }).catch((err) =>{
+    console.log(err);
+  })
   }
 
   render() {
+    const{featured} = this.state
     return (
       <div className="home">
           <Header />
         <div className="container">
-          <div class="nav-scroller py-1 mb-2">
-            <nav class="nav d-flex justify-content-between">
-              <a class="link-secondary" href=".">
-                World
-              </a>
-              <a class="link-secondary" href=".">
-                U.S.
-              </a>
-              <a class="link-secondary" href=".">
-                Technology
-              </a>
-              <a class="link-secondary" href=".">
-                Design
-              </a>
-              <a class="link-secondary" href=".">
-                Culture
-              </a>
-              <a class="link-secondary" href=".">
-                Business
-              </a>
-              <a class="link-secondary" href=".">
-                Politics
-              </a>
-              <a class="link-secondary" href=".">
-                Opinion
-              </a>
-              <a class="link-secondary" href=".">
-                Science
-              </a>
-              <a class="link-secondary" href=".">
-                Health
-              </a>
-              <a class="link-secondary" href=".">
-                Style
-              </a>
-              <a class="link-secondary" href=".">
-                Travel
-              </a>
+          <div className="nav-scroller py-1 mb-2">
+            <nav className="nav d-flex justify-content-between">
+
+              {this.state.categories.map((cat) =>(
+                <Link key={cat._id} className="link-secondary" to={"/category/" + cat.title}>
+                  {cat.title}
+                </Link>
+              ))}
+              
             </nav>
           </div>
         </div>
@@ -60,12 +77,10 @@ class Home extends Component {
           <div className="row p-4 p-md-5 mb-4 text-white rounded bg-dark">
             <div className="col-md-6 px-0">
               <h1 className="display-4 fst-italic">
-                Title of a longer featured blog post
+                {featured.title}
               </h1>
               <p className="lead my-3">
-                Multiple lines of text that form the lede, informing new readers
-                quickly and efficiently about what’s most interesting in this
-                post’s contents.
+                {featured.description}
               </p>
               <p className="lead mb-0">
                 <a href="." className="text-white fw-bold">
@@ -73,84 +88,34 @@ class Home extends Component {
                 </a>
               </p>
             </div>
-            <div className="col-md-6">
-              <img src="/try.jpg" width="100%" height="100%" alt="prop" />
+            <div className="col-md-6" style={{height:'250px'}}>
+              <img src={"/blog/"+ featured.image} width="100%" height="100%" alt="prop" />
             </div>
           </div>
 
           <div className="row mb-2">
-            <div className="col-md-6">
+            {this.state.mainFeatured.map((featuredBlogs) =>(
+            <div className="col-md-6" key={featuredBlogs._id}>
               <div className="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
                 <div className="col p-4 d-flex flex-column position-static">
-                  <strong className="d-inline-block mb-2 text-primary">
-                    World
+                  <strong className="d-inline-block mb-2 text-danger">
+                    {featuredBlogs.category}
                   </strong>
-                  <h3 className="mb-0">Featured post</h3>
-                  <div className="mb-1 text-muted">Nov 12</div>
+                  <h3 className="mb-0">{featuredBlogs.title}</h3>
+                  <div className="mb-1 text-muted">{featuredBlogs.date}, {featuredBlogs.time}</div>
                   <p className="card-text mb-auto">
-                    This is a wider card with supporting text below as a natural
-                    lead-in to additional content.
+                    {featuredBlogs.description}
                   </p>
                   <a href="." className="stretched-link">
-                    Continue reading
+                    Continue reading...
                   </a>
                 </div>
-                <div className="col-auto d-none d-lg-block">
-                  <svg
-                    className="bd-placeholder-img"
-                    width="200"
-                    height="250"
-                    xmlns="http://www.w3.org/2000/svg"
-                    role="img"
-                    aria-label="Placeholder: Thumbnail"
-                    preserveAspectRatio="xMidYMid slice"
-                    focusable="false"
-                  >
-                    <title>Placeholder</title>
-                    <rect width="100%" height="100%" fill="#55595c" />
-                    <text x="50%" y="50%" fill="#eceeef" dy=".3em">
-                      Thumbnail
-                    </text>
-                  </svg>
+                <div className="col-auto d-none d-lg-block" style={{height:'250px',width:'200px'}}>
+                  <img src={"/blog/"+ featuredBlogs.image} height="100%" width="100%" alt="prop" />
                 </div>
               </div>
             </div>
-            <div className="col-md-6">
-              <div className="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-                <div className="col p-4 d-flex flex-column position-static">
-                  <strong className="d-inline-block mb-2 text-success">
-                    Design
-                  </strong>
-                  <h3 className="mb-0">Post title</h3>
-                  <div className="mb-1 text-muted">Nov 11</div>
-                  <p className="mb-auto">
-                    This is a wider card with supporting text below as a natural
-                    lead-in to additional content.
-                  </p>
-                  <a href="." className="stretched-link">
-                    Continue reading
-                  </a>
-                </div>
-                <div className="col-auto d-none d-lg-block">
-                  <svg
-                    className="bd-placeholder-img"
-                    width="200"
-                    height="250"
-                    xmlns="http://www.w3.org/2000/svg"
-                    role="img"
-                    aria-label="Placeholder: Thumbnail"
-                    preserveAspectRatio="xMidYMid slice"
-                    focusable="false"
-                  >
-                    <title>Placeholder</title>
-                    <rect width="100%" height="100%" fill="#55595c" />
-                    <text x="50%" y="50%" fill="#eceeef" dy=".3em">
-                      Thumbnail
-                    </text>
-                  </svg>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
 
 
@@ -160,152 +125,32 @@ class Home extends Component {
                 <div className="col-6">
                 <h3>Latest Posts</h3>
                 </div>
-                <div className="col-6" align="end">
-                <a href=".">See All</a>
+                <div className="col-6 mt-2" align="end">
+                <Link to="/latest">See All</Link>
                 </div>
               </div>
             
-
-              <div className="row mt-4 g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+              {this.state.latest.map((blog) =>(
+              <div key={blog._id} className="row mt-4 g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
                 <div className="col p-4 d-flex flex-column position-static">
                   <strong className="d-inline-block mb-2 text-success">
-                    Design
+                    {blog.category}
                   </strong>
-                  <h3 className="mb-0">Post title</h3>
-                  <div className="mb-1 text-muted">Nov 11</div>
+                  <h3 className="mb-0">{blog.title}</h3>
+                  <div className="mb-1 text-muted">{blog.date}, {blog.time}</div>
                   <p className="mb-auto">
-                    This is a wider card with supporting text below as a natural
-                    lead-in to additional content.
+                    {blog.description}
                   </p>
                   <a href="." className="stretched-link">
-                    Continue reading
+                    Continue reading...
                   </a>
                 </div>
-                <div className="col-auto d-none d-lg-block">
-                  <svg
-                    className="bd-placeholder-img"
-                    width="200"
-                    height="250"
-                    xmlns="http://www.w3.org/2000/svg"
-                    role="img"
-                    aria-label="Placeholder: Thumbnail"
-                    preserveAspectRatio="xMidYMid slice"
-                    focusable="false"
-                  >
-                    <title>Placeholder</title>
-                    <rect width="100%" height="100%" fill="#55595c" />
-                    <text x="50%" y="50%" fill="#eceeef" dy=".3em">
-                      Thumbnail
-                    </text>
-                  </svg>
+                <div className="col-auto d-none d-lg-block" style={{height:'250px',width:'300px'}}>
+                <img src={"/blog/"+ blog.image} height="100%" width="100%" alt="prop" />
                 </div>
               </div>
+              ))}
 
-
-              <div className="row mt-4 g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-                <div className="col p-4 d-flex flex-column position-static">
-                  <strong className="d-inline-block mb-2 text-success">
-                    Design
-                  </strong>
-                  <h3 className="mb-0">Post title</h3>
-                  <div className="mb-1 text-muted">Nov 11</div>
-                  <p className="mb-auto">
-                    This is a wider card with supporting text below as a natural
-                    lead-in to additional content.
-                  </p>
-                  <a href="." className="stretched-link">
-                    Continue reading
-                  </a>
-                </div>
-                <div className="col-auto d-none d-lg-block">
-                  <svg
-                    className="bd-placeholder-img"
-                    width="200"
-                    height="250"
-                    xmlns="http://www.w3.org/2000/svg"
-                    role="img"
-                    aria-label="Placeholder: Thumbnail"
-                    preserveAspectRatio="xMidYMid slice"
-                    focusable="false"
-                  >
-                    <title>Placeholder</title>
-                    <rect width="100%" height="100%" fill="#55595c" />
-                    <text x="50%" y="50%" fill="#eceeef" dy=".3em">
-                      Thumbnail
-                    </text>
-                  </svg>
-                </div>
-              </div>
-
-              <div className="row mt-4 g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-                <div className="col p-4 d-flex flex-column position-static">
-                  <strong className="d-inline-block mb-2 text-success">
-                    Design
-                  </strong>
-                  <h3 className="mb-0">Post title</h3>
-                  <div className="mb-1 text-muted">Nov 11</div>
-                  <p className="mb-auto">
-                    This is a wider card with supporting text below as a natural
-                    lead-in to additional content.
-                  </p>
-                  <a href="." className="stretched-link">
-                    Continue reading
-                  </a>
-                </div>
-                <div className="col-auto d-none d-lg-block">
-                  <svg
-                    className="bd-placeholder-img"
-                    width="200"
-                    height="250"
-                    xmlns="http://www.w3.org/2000/svg"
-                    role="img"
-                    aria-label="Placeholder: Thumbnail"
-                    preserveAspectRatio="xMidYMid slice"
-                    focusable="false"
-                  >
-                    <title>Placeholder</title>
-                    <rect width="100%" height="100%" fill="#55595c" />
-                    <text x="50%" y="50%" fill="#eceeef" dy=".3em">
-                      Thumbnail
-                    </text>
-                  </svg>
-                </div>
-              </div>
-
-              <div className="row mt-4 g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-                <div className="col p-4 d-flex flex-column position-static">
-                  <strong className="d-inline-block mb-2 text-success">
-                    Design
-                  </strong>
-                  <h3 className="mb-0">Post title</h3>
-                  <div className="mb-1 text-muted">Nov 11</div>
-                  <p className="mb-auto">
-                    This is a wider card with supporting text below as a natural
-                    lead-in to additional content.
-                  </p>
-                  <a href="." className="stretched-link">
-                    Continue reading
-                  </a>
-                </div>
-                <div className="col-auto d-none d-lg-block">
-                  <svg
-                    className="bd-placeholder-img"
-                    width="200"
-                    height="250"
-                    xmlns="http://www.w3.org/2000/svg"
-                    role="img"
-                    aria-label="Placeholder: Thumbnail"
-                    preserveAspectRatio="xMidYMid slice"
-                    focusable="false"
-                  >
-                    <title>Placeholder</title>
-                    <rect width="100%" height="100%" fill="#55595c" />
-                    <text x="50%" y="50%" fill="#eceeef" dy=".3em">
-                      Thumbnail
-                    </text>
-                  </svg>
-                </div>
-              </div>
             </div>
             <div className="col-2 offset-1" align="center" style={{borderLeft:"5px solid black"}}>
               <div className="row px-2 py-2 mx-auto" style={{background:"#eeeeee"}}>
@@ -329,43 +174,25 @@ class Home extends Component {
           </div>
           
 
-          <div className="p-4 mt-4 p-md-5 text-white rounded bg-dark">
-            <div className="col-md-12 px-0" align="center">
-              <h1 className="display-4 fst-italic">
+          <div className="p-4 mt-4 p-md-5 text-white rounded" style={{background:'url("/hero.jpg")'}}>
+            <div className="col-md-12 px-0" align="center" style={{background:'rgba(0,0,0,0.2)'}}>
+              <h1 className="display-8 fst-italic text-dark">
                 Title of a longer featured blog post
               </h1>
-              <p className="lead my-3">
+              <h4 className="display-10 my-3 text-dark">
                 Multiple lines of text that form the lede, informing new readers
                 quickly and efficiently about what’s most interesting in this
                 post’s contents.
-              </p>
+              </h4>
             </div>
           </div>
 
 
 
           <div className="row mb-2 mt-4">
-            <div className="col-md-4">
-              <div className="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-              <div className="row d-none d-lg-block">
-                  <svg
-                    className="bd-placeholder-img"
-                    width="200"
-                    height="250"
-                    xmlns="http://www.w3.org/2000/svg"
-                    role="img"
-                    aria-label="Placeholder: Thumbnail"
-                    preserveAspectRatio="xMidYMid slice"
-                    focusable="false"
-                  >
-                    <title>Placeholder</title>
-                    <rect width="100%" height="100%" fill="#55595c" />
-                    <text x="50%" y="50%" fill="#eceeef" dy=".3em">
-                      Thumbnail
-                    </text>
-                  </svg>
-                </div>
-                <div className="row p-4 d-flex position-static">
+            <div className="col-md-6">
+              <div style={{background:"url('/try.jpg')"}} className="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+                <div style={{background:"rgba(0,0,0,0.1)"}} className="col p-4 d-flex flex-column position-static">
                   <strong className="d-inline-block mb-2 text-primary">
                     World
                   </strong>
@@ -375,85 +202,24 @@ class Home extends Component {
                     This is a wider card with supporting text below as a natural
                     lead-in to additional content.
                   </p>
-                  <a href="." className="stretched-link">
-                    Continue reading
-                  </a>
                 </div>
               </div>
             </div>
-            <div className="col-md-4">
-              <div className="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-              <div className="row d-none d-lg-block">
-                  <svg
-                    className="bd-placeholder-img"
-                    width="200"
-                    height="250"
-                    xmlns="http://www.w3.org/2000/svg"
-                    role="img"
-                    aria-label="Placeholder: Thumbnail"
-                    preserveAspectRatio="xMidYMid slice"
-                    focusable="false"
-                  >
-                    <title>Placeholder</title>
-                    <rect width="100%" height="100%" fill="#55595c" />
-                    <text x="50%" y="50%" fill="#eceeef" dy=".3em">
-                      Thumbnail
-                    </text>
-                  </svg>
-                </div>
-                <div className="row p-4 d-flex position-static">
-                  <strong className="d-inline-block mb-2 text-primary">
-                    World
+            <div className="col-md-6">
+              <div style={{background:"url('/signup.jpg')"}} className="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+                <div style={{background:"rgba(0,0,0,0.1)"}} className="col p-4 d-flex flex-column position-static">
+                  <strong className="d-inline-block mb-2 text-success">
+                    Design
                   </strong>
-                  <h3 className="mb-0">Featured post</h3>
-                  <div className="mb-1 text-muted">Nov 12</div>
-                  <p className="card-text mb-auto">
+                  <h3 className="mb-0">Post title</h3>
+                  <div className="mb-1 text-muted">Nov 11</div>
+                  <p className="mb-auto">
                     This is a wider card with supporting text below as a natural
                     lead-in to additional content.
                   </p>
-                  <a href="." className="stretched-link">
-                    Continue reading
-                  </a>
                 </div>
               </div>
             </div>
-            <div className="col-md-4">
-              <div className="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-              <div className="row d-none d-lg-block">
-                  <svg
-                    className="bd-placeholder-img"
-                    width="200"
-                    height="250"
-                    xmlns="http://www.w3.org/2000/svg"
-                    role="img"
-                    aria-label="Placeholder: Thumbnail"
-                    preserveAspectRatio="xMidYMid slice"
-                    focusable="false"
-                  >
-                    <title>Placeholder</title>
-                    <rect width="100%" height="100%" fill="#55595c" />
-                    <text x="50%" y="50%" fill="#eceeef" dy=".3em">
-                      Thumbnail
-                    </text>
-                  </svg>
-                </div>
-                <div className="row p-4 d-flex position-static">
-                  <strong className="d-inline-block mb-2 text-primary">
-                    World
-                  </strong>
-                  <h3 className="mb-0">Featured post</h3>
-                  <div className="mb-1 text-muted">Nov 12</div>
-                  <p className="card-text mb-auto">
-                    This is a wider card with supporting text below as a natural
-                    lead-in to additional content.
-                  </p>
-                  <a href="." className="stretched-link">
-                    Continue reading
-                  </a>
-                </div>
-              </div>
-            </div>
-            
           </div>
 
 

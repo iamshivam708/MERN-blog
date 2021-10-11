@@ -6,7 +6,7 @@ class Footer extends Component {
             <div className="footer">
                 <div className="container mt-4">
                     <div className="row px-2 py-2" align="center" style={{background:"#eeeeee"}}>
-                        <h3><i class="fas fa-arrow-up"></i>&nbsp;Top</h3>
+                        <h3><i className="fas fa-arrow-up"></i>&nbsp;Top</h3>
                     </div>
                     <div className="row px-5 py-5" style={{background:"#fafafa"}}>
                         <div className="col-3">
