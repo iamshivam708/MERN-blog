@@ -1,59 +1,63 @@
-import React, { Component } from "react";
-import axios from "axios";
-import Header from "./Header";
-import Footer from "./Footer";
-import {Link} from 'react-router-dom'
+import React, {useState, useEffect} from 'react'
+import axios from 'axios'
+import {Link, useParams, useHistory} from 'react-router-dom'
+import Header from './Header';
+import Footer from './Footer';
 
-class Archive extends Component {
-  constructor(props) {
-    super(props);
+function Archive() {
 
-    this.state = {
-      text: this.props.match.params.text,
-      blogs: [],
-      categories:[]
-    };
-  }
+    let {text} = useParams();
+    let history = useHistory();
+    const [pageNumber, setPageNumber] = useState(0)
+    const [numberOfPages, setNumberOfPages] = useState(0)
+    const [posts, setPosts] = useState([])
+    const [categories,setCategories] = useState([])
 
-  componentDidMount = () => {
-    var url = `http://localhost:5000/blog/archive/${this.state.text}`;
-    axios
-      .get(url)
-      .then((res) => {
-        console.log(res);
-        this.setState({
-          blogs: res.data,
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    const pages = new Array(numberOfPages).fill(null).map((v,i) => i);
+    const archive = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-      const url2 = "http://localhost:5000/category";
+    useEffect(() => {
+        axios.get(`http://localhost:5000/blog/archive/${text}/${pageNumber}`)
+        .then((res) =>{
+            setPosts(res.data.posts)
+            setNumberOfPages(res.data.totalPages)
+            console.log(res.data.totalPages)
+        }).catch((err) =>{
+            console.log(err);
+        })
+    }, [pageNumber])
+
+    useEffect(() => {
+        const url2 = "http://localhost:5000/category";
     axios
       .get(url2)
       .then((res) => {
-        this.setState({
-          categories: res.data,
-        });
+        setCategories(res.data)
       })
       .catch((err) => {
         console.log(err);
       });
-  };
+    },[categories])
 
-  handleClick = (name) =>{
-    return event =>{
-      event.preventDefault();
-      console.log(name);
-      this.props.history.push('/category/' + name);
-      window.location.reload();
+    const handleClick = (name) =>{
+        return event =>{
+          event.preventDefault();
+          history.push('/category/' + name);
+          window.location.reload();
+        }
     }
-}
 
-  render() {
+    const handleArchive = (name) =>{
+      return event =>{
+        event.preventDefault();
+        history.push('/archive/' + name);
+        window.location.reload();
+      }
+  }
+
+
     return (
-      <div className="Archive">
+        <div className="Archive">
           <Header />
           <main
             className="container px-5 py-3 mt-4"
@@ -87,11 +91,11 @@ class Archive extends Component {
                   style={{ background: "#eeeeee" }}
                 >
                   <div className="col-6">
-                    <h3>All {this.state.text} Posts</h3>
+                    <h3>All {text} Posts</h3>
                   </div>
                 </div>
 
-                {this.state.blogs.map((blog) =>(
+                {posts.map((blog) =>(
               <div key={blog._id} className="row mt-4 g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
                 <div className="col p-4 d-flex flex-column position-static">
                   <strong className="d-inline-block mb-2 text-success">
@@ -113,37 +117,10 @@ class Archive extends Component {
               ))}
 
 
-                <div className="row">
-                  <nav aria-label="Page navigation example">
-                    <ul className="pagination justify-content-center">
-                      <li className="page-item disabled">
-                        <a className="page-link" href=".">
-                          Previous
-                        </a>
-                      </li>
-                      <li className="page-item">
-                        <a className="page-link" href=".">
-                          1
-                        </a>
-                      </li>
-                      <li className="page-item">
-                        <a className="page-link" href=".">
-                          2
-                        </a>
-                      </li>
-                      <li className="page-item">
-                        <a className="page-link" href=".">
-                          3
-                        </a>
-                      </li>
-                      <li className="page-item">
-                        <a className="page-link" href=".">
-                          Next
-                        </a>
-                      </li>
-                    </ul>
-                  </nav>
-                </div>
+            {pages.map((pageIndex) =>(
+                <button key={pageIndex} onClick={() => setPageNumber(pageIndex)} className="btn btn-primary mx-1">{pageIndex + 1}</button>
+            ))}
+
               </div>
               <div
                 className="col-2 offset-1"
@@ -157,18 +134,10 @@ class Archive extends Component {
                   <h3>Archives</h3>
                 </div>
                 <ul>
-                <li className="mt-4" style={{listStyle:'none'}}><Link style={{textDecoration:"none", color:'black'}} to={"/archive/jan"}>January</Link></li>
-                <li className="mt-1" style={{listStyle:'none'}}><Link style={{textDecoration:"none", color:'black'}} to={"/archive/feb"}>February</Link></li>
-                <li className="mt-1" style={{listStyle:'none'}}><Link style={{textDecoration:"none", color:'black'}} to={"/archive/mar"}>March</Link></li>
-                <li className="mt-1" style={{listStyle:'none'}}><Link style={{textDecoration:"none", color:'black'}} to={"/archive/apr"}>April</Link></li>
-                <li className="mt-1" style={{listStyle:'none'}}><Link style={{textDecoration:"none", color:'black'}} to={"/archive/may"}>May</Link></li>
-                <li className="mt-1" style={{listStyle:'none'}}><Link style={{textDecoration:"none", color:'black'}} to={"/archive/june"}>June</Link></li>
-                <li className="mt-1" style={{listStyle:'none'}}><Link style={{textDecoration:"none", color:'black'}} to={"/archive/july"}>July</Link></li>
-                <li className="mt-1" style={{listStyle:'none'}}><Link style={{textDecoration:"none", color:'black'}} to={"/archive/aug"}>August</Link></li>
-                <li className="mt-1" style={{listStyle:'none'}}><Link style={{textDecoration:"none", color:'black'}} to={"/archive/sep"}>September</Link></li>
-                <li className="mt-1" style={{listStyle:'none'}}><Link style={{textDecoration:"none", color:'black'}} to={"/archive/oct"}>October</Link></li>
-                <li className="mt-1" style={{listStyle:'none'}}><Link style={{textDecoration:"none", color:'black'}} to={"/archive/nov"}>November</Link></li>
-                <li className="mt-1" style={{listStyle:'none'}}><Link style={{textDecoration:"none", color:'black'}} to={"/archive/dec"}>December</Link></li>
+                  {archive.map((arc) =>(
+                      <li className="mt-2" style={{listStyle:'none'}}>
+                        <button className="link-secondary" style={{cursor:'pointer',border: "none", background: "none"}} onClick={handleArchive(arc)} >{arc}</button></li>
+                  ))}
               </ul>
                 <div className="row mt-4">
                   <div className="px-2 py-2" style={{ background: "#eeeeee" }}>
@@ -178,13 +147,13 @@ class Archive extends Component {
                     className="mt-2"
                     style={{ listStyle: "none", lineBreak: "20px" }}
                   >
-                    {this.state.categories.map((cat) => (
+                    {categories.map((cat) => (
                       <li key={cat._id} className="mt-2">
                         <button
                           key={cat._id}
                           className="link-secondary"
                           style={{ border: "none", background: "none" }}
-                          onClick={this.handleClick(cat.title)}
+                          onClick={handleClick(cat.title)}
                         >
                           {cat.title}
                         </button>
@@ -197,8 +166,7 @@ class Archive extends Component {
           </main>
           <Footer />
         </div>
-    );
-  }
+    )
 }
 
-export default Archive;
+export default Archive

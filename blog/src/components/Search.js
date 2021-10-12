@@ -1,92 +1,92 @@
-import React, { Component } from "react";
-import Footer from "./Footer";
-import Header from "./Header";
+import React, {useState, useEffect} from 'react'
 import axios from 'axios'
+import {Link, useParams, useHistory} from 'react-router-dom'
+import Header from './Header';
+import Footer from './Footer';
 
-class Search extends Component {
-  constructor(props) {
-    super(props);
+function Search() {
 
-    this.state = {
-      title: this.props.match.params.search,
-      categories: [],
-      blogs:[]
-    };
-  }
+    let {text} = useParams();
+    let history = useHistory();
+    const [pageNumber, setPageNumber] = useState(0)
+    const [numberOfPages, setNumberOfPages] = useState(0)
+    const [posts, setPosts] = useState([])
+    const [categories,setCategories] = useState([])
 
-  componentDidMount = () => {
-    const url = "http://localhost:5000/category";
-    axios
-      .get(url)
-      .then((res) => {
-        this.setState({
-          categories: res.data,
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    const pages = new Array(numberOfPages).fill(null).map((v,i) => i);
 
-      const url2 = `http://localhost:5000/blog/search/${this.state.title}`;
+    useEffect(() => {
+        axios.get(`http://localhost:5000/blog/search/${text}/${pageNumber}`)
+        .then((res) =>{
+            setPosts(res.data.posts)
+            setNumberOfPages(res.data.totalPages)
+            console.log(res.data.totalPages)
+        }).catch((err) =>{
+            console.log(err);
+        })
+    }, [pageNumber])
+
+    useEffect(() => {
+        const url2 = "http://localhost:5000/category";
     axios
       .get(url2)
       .then((res) => {
-        this.setState({
-          blogs: res.data
-        });
+        setCategories(res.data)
       })
       .catch((err) => {
         console.log(err);
       });
-  };
+    })
 
-  handleClick = (name) =>{
-      return event =>{
-        event.preventDefault();
-        console.log(name);
-        this.props.history.push('/category/' + name);
-        window.location.reload();
-      }
-  }
+    const handleClick = (name) =>{
+        return event =>{
+          event.preventDefault();
+          history.push('/category/' + name);
+          window.location.reload();
+        }
+    }
 
-  render() {
+
     return (
-      <div className="category">
-        <Header />
-        <main
-          className="container px-5 py-3 mt-4"
-          style={{ background: "#fafafa" }}
-        >
-          <div className="row p-4 p-md-5 mb-4 text-white rounded bg-dark">
-            <div className="col-md-6 px-0">
-              <h1 className="display-4 fst-italic">
-                Title of a longer featured {this.state.title} post
-              </h1>
-              <p className="lead my-3">
-                Multiple lines of text that form the lede, informing new readers
-                quickly and efficiently about what’s most interesting in this
-                post’s contents.
-              </p>
-              <p className="lead mb-0">
-                <a href="." className="text-white fw-bold">
-                  Continue reading...
-                </a>
-              </p>
-            </div>
-            <div className="col-md-6">
-              <img src="/try.jpg" width="100%" height="100%" alt="prop" />
-            </div>
-          </div>
-
-          <div className="row">
-            <div className="col-9">
-              <div className="row py-2 px-2" style={{ background: "#eeeeee" }}>
-                <div className="col-6">
-                  <h3>All {this.state.title} Posts</h3>
-                </div>
+        <div className="Archive">
+          <Header />
+          <main
+            className="container px-5 py-3 mt-4"
+            style={{ background: "#fafafa" }}
+          >
+            <div className="row p-4 p-md-5 mb-4 text-white rounded bg-dark">
+              <div className="col-md-6 px-0">
+                <h1 className="display-4 fst-italic">
+                  Title of a longer featured post
+                </h1>
+                <p className="lead my-3">
+                  Multiple lines of text that form the lede, informing new
+                  readers quickly and efficiently about what’s most interesting
+                  in this post’s contents.
+                </p>
+                <p className="lead mb-0">
+                  <a href="." className="text-white fw-bold">
+                    Continue reading...
+                  </a>
+                </p>
               </div>
+              <div className="col-md-6">
+                <img src="/try.jpg" width="100%" height="100%" alt="prop" />
+              </div>
+            </div>
 
-              {this.state.blogs.map((blog) =>(
+            <div className="row">
+              <div className="col-9">
+                <div
+                  className="row py-2 px-2"
+                  style={{ background: "#eeeeee" }}
+                >
+                  <div className="col-6">
+                    <h3>All {text} Posts</h3>
+                  </div>
+                </div>
+
+                {posts.map((blog) =>(
               <div key={blog._id} className="row mt-4 g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
                 <div className="col p-4 d-flex flex-column position-static">
                   <strong className="d-inline-block mb-2 text-success">
@@ -97,9 +97,9 @@ class Search extends Component {
                   <p className="mb-auto">
                     {blog.description}
                   </p>
-                  <a href="." className="stretched-link">
+                  <Link to={"/blog/"+ blog._id} className="stretched-link">
                     Continue reading...
-                  </a>
+                  </Link>
                 </div>
                 <div className="col-auto d-none d-lg-block" style={{height:'250px',width:'300px'}}>
                 <img src={"/blog/"+ blog.image} height="100%" width="100%" alt="prop" />
@@ -107,92 +107,65 @@ class Search extends Component {
               </div>
               ))}
 
-              <div className="row">
-              <nav aria-label="Page navigation example">
-                <ul className="pagination justify-content-center">
-                    <li className="page-item disabled">
-                    <a className="page-link" href=".">Previous</a>
-                    </li>
-                    <li className="page-item"><a className="page-link" href=".">1</a></li>
-                    <li className="page-item"><a className="page-link" href=".">2</a></li>
-                    <li className="page-item"><a className="page-link" href=".">3</a></li>
-                    <li className="page-item">
-                    <a className="page-link" href=".">Next</a>
-                    </li>
-                </ul>
-                </nav>
+
+            {pages.map((pageIndex) =>(
+                <button key={pageIndex} onClick={() => setPageNumber(pageIndex)} className="btn btn-primary mx-1">{pageIndex + 1}</button>
+            ))}
+
               </div>
-            </div>
-            <div
-              className="col-2 offset-1"
-              align="center"
-              style={{ borderLeft: "5px solid black" }}
-            >
-              <div className="row px-2 py-2" style={{ background: "#eeeeee" }}>
-                <h3>Archives</h3>
-              </div>
-              <ul>
-                <li className="mt-4" style={{ listStyle: "none" }}>
-                  January 2021
-                </li>
-                <li className="mt-1" style={{ listStyle: "none" }}>
-                  February 2021
-                </li>
-                <li className="mt-1" style={{ listStyle: "none" }}>
-                  March 2021
-                </li>
-                <li className="mt-1" style={{ listStyle: "none" }}>
-                  April 2021
-                </li>
-                <li className="mt-1" style={{ listStyle: "none" }}>
-                  May 2021
-                </li>
-                <li className="mt-1" style={{ listStyle: "none" }}>
-                  June 2021
-                </li>
-                <li className="mt-1" style={{ listStyle: "none" }}>
-                  July 2021
-                </li>
-                <li className="mt-1" style={{ listStyle: "none" }}>
-                  August 2021
-                </li>
-                <li className="mt-1" style={{ listStyle: "none" }}>
-                  September 2021
-                </li>
-                <li className="mt-1" style={{ listStyle: "none" }}>
-                  October 2021
-                </li>
-                <li className="mt-1" style={{ listStyle: "none" }}>
-                  November 2021
-                </li>
-                <li className="mt-1" style={{ listStyle: "none" }}>
-                  December 2021
-                </li>
-              </ul>
-              <div className="row mt-4">
-                <div className="px-2 py-2" style={{ background: "#eeeeee" }}>
-                  <h3>Categories</h3>
+              <div
+                className="col-2 offset-1"
+                align="center"
+                style={{ borderLeft: "5px solid black" }}
+              >
+                <div
+                  className="row px-2 py-2"
+                  style={{ background: "#eeeeee" }}
+                >
+                  <h3>Archives</h3>
                 </div>
-                <ul className="mt-2" style={{listStyle:'none',lineBreak:"20px"}}>
-                  {this.state.categories.map((cat) => (
-                    <li key={cat._id} className="mt-2"><button
-                      key={cat._id}
-                      className="link-secondary"
-                      style={{border:'none', background:"none"}}
-                      onClick={this.handleClick(cat.title)}
-                    >
-                      {cat.title}
-                    </button></li>
-                  ))}
-                </ul>
+                <ul>
+                <li className="mt-4" style={{listStyle:'none'}}><Link style={{textDecoration:"none", color:'black'}} to={"/archive/jan"}>January</Link></li>
+                <li className="mt-1" style={{listStyle:'none'}}><Link style={{textDecoration:"none", color:'black'}} to={"/archive/feb"}>February</Link></li>
+                <li className="mt-1" style={{listStyle:'none'}}><Link style={{textDecoration:"none", color:'black'}} to={"/archive/mar"}>March</Link></li>
+                <li className="mt-1" style={{listStyle:'none'}}><Link style={{textDecoration:"none", color:'black'}} to={"/archive/apr"}>April</Link></li>
+                <li className="mt-1" style={{listStyle:'none'}}><Link style={{textDecoration:"none", color:'black'}} to={"/archive/may"}>May</Link></li>
+                <li className="mt-1" style={{listStyle:'none'}}><Link style={{textDecoration:"none", color:'black'}} to={"/archive/june"}>June</Link></li>
+                <li className="mt-1" style={{listStyle:'none'}}><Link style={{textDecoration:"none", color:'black'}} to={"/archive/july"}>July</Link></li>
+                <li className="mt-1" style={{listStyle:'none'}}><Link style={{textDecoration:"none", color:'black'}} to={"/archive/aug"}>August</Link></li>
+                <li className="mt-1" style={{listStyle:'none'}}><Link style={{textDecoration:"none", color:'black'}} to={"/archive/sep"}>September</Link></li>
+                <li className="mt-1" style={{listStyle:'none'}}><Link style={{textDecoration:"none", color:'black'}} to={"/archive/oct"}>October</Link></li>
+                <li className="mt-1" style={{listStyle:'none'}}><Link style={{textDecoration:"none", color:'black'}} to={"/archive/nov"}>November</Link></li>
+                <li className="mt-1" style={{listStyle:'none'}}><Link style={{textDecoration:"none", color:'black'}} to={"/archive/dec"}>December</Link></li>
+              </ul>
+                <div className="row mt-4">
+                  <div className="px-2 py-2" style={{ background: "#eeeeee" }}>
+                    <h3>Categories</h3>
+                  </div>
+                  <ul
+                    className="mt-2"
+                    style={{ listStyle: "none", lineBreak: "20px" }}
+                  >
+                    {categories.map((cat) => (
+                      <li key={cat._id} className="mt-2">
+                        <button
+                          key={cat._id}
+                          className="link-secondary"
+                          style={{ border: "none", background: "none" }}
+                          onClick={handleClick(cat.title)}
+                        >
+                          {cat.title}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             </div>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
+          </main>
+          <Footer />
+        </div>
+    )
 }
 
-export default Search;
+export default Search

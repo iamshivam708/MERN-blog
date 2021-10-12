@@ -4,7 +4,7 @@ import {Link, useParams, useHistory} from 'react-router-dom'
 import Header from './Header';
 import Footer from './Footer';
 
-function Category() {
+function Practice() {
 
     let {text} = useParams();
     let history = useHistory();
@@ -168,4 +168,4 @@ function Category() {
     )
 }
 
-export default Category
+export default Practice
